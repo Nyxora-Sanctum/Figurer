@@ -49,9 +49,11 @@ class User extends Authenticatable
         ];
     }
     // In User model
-    public function hasAnyRole($roles)
+    public function hasAnyRole(array $roles): bool
     {
-        return $this->roles()->whereIn('name', $roles)->exists();
+        return in_array($this->role, $roles);
     }
+
+
 
 }
