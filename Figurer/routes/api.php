@@ -13,7 +13,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 });
 
-Route::middleware('auth:sanctum', 'CheckRole:user')->group(function () {
+Route::middleware('auth:sanctum', 'CheckRole:user,admin')->group(function () {
     Route::post('/prompt', [AIController::class, 'AIOutput']);
 });
 

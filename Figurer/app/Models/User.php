@@ -23,7 +23,8 @@ class User extends Authenticatable
         'username',
         'email',
         'password',
-        'role'
+        'role',
+        'subscription',
     ];
 
     /**
@@ -53,7 +54,10 @@ class User extends Authenticatable
     {
         return in_array($this->role, $roles);
     }
-
+    public function hasAnySubscription(array $subscription): bool
+    {
+        return in_array($this->subscription, $subscription);
+    }
 
 
 }

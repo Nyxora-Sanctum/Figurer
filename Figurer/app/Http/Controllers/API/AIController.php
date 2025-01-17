@@ -29,6 +29,7 @@ class AIController extends Controller
                                 Skills : Detailed Skills,
                                 Projects : Detailed Projects,}
                                 
+                                Language: according to the user information provided. If user information using english then process with english, if user information using bahasa then process with bahasa.
                                 Extract information from prompt. If the input is not complete and input detected not related with portofolio maker purpose please response with 'Error'. Write beautiful medium length portofolio for experience. If User providing not enough information, please type 'Need Information About: Variable'.",
                         ],
                         [
