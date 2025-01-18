@@ -6,6 +6,7 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Middleware\CheckRole;
 use App\Http\Controllers\API\PaymentController;
 use App\Http\Controllers\API\AIController;
+use App\Http\Controllers\API\UserController;
 
 // Public routes to access login and register
 Route::post('/register', [AuthController::class, 'register']);
@@ -20,7 +21,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 // Only user can access
 Route::middleware('auth:sanctum', 'CheckRole:user')->group(function () {
-    Route::post('/buy', [PaymentController::class,'payment']);
+    
+    // User Management routes
+    Route::get('/user/profile', [UserController::class, 'getCurrentProfile']);
+    Route::patch('/user/profile', [UserController::class, 'updateProfile']);
+    Route::get('/user/owned-templates', [UserController::class, 'getOwnedTemplates']);
+
+    // Payment routes
+    Route::post('/transaction/buy', [PaymentController::class,'payment']);
     Route::middleware('auth:sanctum')->get('/transaction/{id}', [PaymentController::class, 'getTransaction']);
 });
 

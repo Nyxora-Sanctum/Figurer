@@ -10,6 +10,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use App\Models\User;
 
 class CheckPaymentStatus implements ShouldQueue
 {
@@ -17,18 +18,21 @@ class CheckPaymentStatus implements ShouldQueue
 
     public $transaction;
     public $orderId;
+    public $userId;
 
     /**
      * Create a new job instance.
      *
      * @param Transactions $transaction
      * @param string $orderId
+     * @param int $userId
      * @return void
      */
-    public function __construct(Transactions $transaction, $orderId)
+    public function __construct(Transactions $transaction, $orderId, $userId)
     {
         $this->transaction = $transaction;
         $this->orderId = $orderId;
+        $this->userId = $userId;  // Store the user ID
     }
 
     /**
@@ -57,7 +61,23 @@ class CheckPaymentStatus implements ShouldQueue
                 if (isset($responseBody['transaction_status']) && $responseBody['transaction_status'] == 'settlement') {
                     $this->transaction->status = 'paid';
                     $this->transaction->save();
-                    Log::info('Payment successful, transaction marked as paid.');
+
+                    // Retrieve user by ID
+                    $user = User::find($this->userId);
+                    if ($user) {
+                        log::info('user append started');
+                        $ownedTemplate = json_decode($user->owned_template, true);
+                        log::info('on owned template');
+                        $ownedTemplate['owned_template'] = $this->transaction->unique_cv_id;
+                        $user->owned_template = json_encode($ownedTemplate);
+                        Log::info(json_encode($ownedTemplate));
+                        $user->save();
+
+                        Log::info('Payment successful, transaction marked as paid.');
+                    } else {
+                        Log::error('User not found');
+                    }
+
                     break;
                 }
 

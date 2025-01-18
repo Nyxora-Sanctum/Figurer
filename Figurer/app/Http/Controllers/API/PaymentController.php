@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use App\Models\Transactions;
 use Illuminate\Support\Facades\DB;
 use App\Jobs\CheckPaymentStatus;
+
 class PaymentController extends Controller
 {
     public function payment(Request $request)
@@ -51,7 +52,8 @@ class PaymentController extends Controller
             $responseBody = json_decode($response->getBody(), true);
 
             // Dispatch the background job to check the payment status
-            CheckPaymentStatus::dispatch($transaction, $orderId);
+            $user = auth()->user();
+            CheckPaymentStatus::dispatch($transaction, $orderId, $user->id);
 
             // Append the order ID to the response
             $responseBody['order_id'] = $orderId;
