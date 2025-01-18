@@ -16,7 +16,14 @@ Route::post(('/login'), [AuthController::class,'login'])->name('login');
 
 // Both user and admin can access
 Route::middleware(['auth:sanctum'])->group(function () {
+    // Template Routes
+    Route::get('/templates/all-templates', [TemplateControlller::class, 'getAllTemplates']);
+    Route::get('/templates/{id}', [TemplateControlller::class, 'getByID']);
+    
+    // Logout Routes
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    // AI Routes
     Route::post('/prompt', [AIController::class, 'AIOutput']);
 });
 
@@ -29,8 +36,6 @@ Route::middleware('auth:sanctum', 'CheckRole:user')->group(function () {
 
     // Template Management routes
     Route::get('/templates/owned-templates', [TemplateControlller::class, 'getAllOwned']);
-    Route::get('/templates/all-templates', [TemplateControlller::class, 'getAllTemplates']);
-    Route::get('/templates/{id}', [TemplateControlller::class, 'getByID']);
 
     // Payment routes
     Route::post('/transaction/buy', [PaymentController::class,'payment']);
@@ -40,7 +45,7 @@ Route::middleware('auth:sanctum', 'CheckRole:user')->group(function () {
 // Only admin can access
 Route::middleware('auth:sanctum', 'CheckRole:admin')->group(function () {
     // Template Management routes
-    Route::post('/templates', [TemplateControlller::class, 'create']);
-    Route::patch('/templates/{id}', [TemplateControlller::class, 'patch']);
-    Route::delete('/templates/{id}', [TemplateControlller::class, 'delete']);
+    Route::post('/admin/templates', [TemplateControlller::class, 'create']);
+    Route::patch('/admin/templates/{id}', [TemplateControlller::class, 'patch']);
+    Route::delete('/admin/templates/{id}', [TemplateControlller::class, 'delete']);
 });

@@ -8,13 +8,25 @@ use Illuminate\Support\Str;
 use App\Models\Transactions;
 use Illuminate\Support\Facades\DB;
 use App\Jobs\CheckPaymentStatus;
+use App\Models\cv_template_data;
 
 class PaymentController extends Controller
 {
     public function payment(Request $request)
     {
         $orderId = 'ORDER-' . Str::random(10);
+        $owned_cv_id = auth()->user()->owned_template;
+        // Verify if the CV exists in cv_template_data
+        $cv = cv_template_data::find($request->unique_cv_id);
+        if (!$cv) {
+            return response()->json(['error' => 'CV not found'], 404);
+        }
 
+        // Verify if the user already owns the CV
+        $ownedTemplates = json_decode($owned_cv_id, true);
+        if (in_array($request->unique_cv_id, $ownedTemplates)) {
+            return response()->json(['error' => 'CV already owned'], 400);
+        }
         // Save the transaction with the generated order ID in your database
         $transaction = Transactions::create([
             'user_id' => $request->user()->id,
