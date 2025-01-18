@@ -72,22 +72,9 @@ jobs:
           
       - name: Run Laravel commands
         run: |
-          ssh ${{ secrets.AZURE_SSH_USER }}@${{ secrets.AZURE_APP_HOST }} << 'EOF'
             cd /home/site/wwwroot
             php artisan migrate --force
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
           EOF
-
-      - name: Set storage directory permissions
-        run: |
-          ssh ${{ secrets.AZURE_SSH_USER }}@${{ secrets.AZURE_APP_HOST }} << 'EOF'
-            chmod -R 775 /home/site/wwwroot/storage
-          EOF
-
-      - name: Force HTTPS (Optional)
-        run: |
-          echo "RewriteEngine On" >> .htaccess
-          echo "RewriteCond %{HTTPS} off" >> .htaccess
-          echo "RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]" >> .htaccess
