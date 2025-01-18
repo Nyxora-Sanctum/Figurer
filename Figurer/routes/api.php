@@ -7,6 +7,7 @@ use App\Http\Middleware\CheckRole;
 use App\Http\Controllers\API\PaymentController;
 use App\Http\Controllers\API\AIController;
 use App\Http\Controllers\API\UserController;
+use App\Http\Controllers\api\TemplateControlller;
 
 // Public routes to access login and register
 Route::post('/register', [AuthController::class, 'register']);
@@ -25,14 +26,21 @@ Route::middleware('auth:sanctum', 'CheckRole:user')->group(function () {
     // User Management routes
     Route::get('/user/profile', [UserController::class, 'getCurrentProfile']);
     Route::patch('/user/profile', [UserController::class, 'updateProfile']);
-    Route::get('/user/owned-templates', [UserController::class, 'getOwnedTemplates']);
+
+    // Template Management routes
+    Route::get('/templates/owned-templates', [TemplateControlller::class, 'getAllOwned']);
+    Route::get('/templates/all-templates', [TemplateControlller::class, 'getAllTemplates']);
+    Route::get('/templates/{id}', [TemplateControlller::class, 'getByID']);
 
     // Payment routes
     Route::post('/transaction/buy', [PaymentController::class,'payment']);
-    Route::middleware('auth:sanctum')->get('/transaction/{id}', [PaymentController::class, 'getTransaction']);
+    Route::get('/transaction/{id}', [PaymentController::class, 'getTransaction']);
 });
 
 // Only admin can access
 Route::middleware('auth:sanctum', 'CheckRole:admin')->group(function () {
-
+    // Template Management routes
+    Route::post('/templates', [TemplateControlller::class, 'create']);
+    Route::patch('/templates/{id}', [TemplateControlller::class, 'patch']);
+    Route::delete('/templates/{id}', [TemplateControlller::class, 'delete']);
 });

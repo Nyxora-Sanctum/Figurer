@@ -6,16 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
-{
-
-    
-    public function getOwnedTemplates(Request $request)
-    {
-        $user = auth()->user();
-        $templates = $user->owned_template;
-        return response()->json($templates);
-    }
-    
+{   
     public function getCurrentProfile(Request $request)
     {
         $user = auth()->user();

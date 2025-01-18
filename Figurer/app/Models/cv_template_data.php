@@ -12,6 +12,7 @@ class cv_template_data extends Model
         'name',
         'id_number',
         'price',
-        'link',
+        'template-link',
+        'template-preview',
     ];
 }
