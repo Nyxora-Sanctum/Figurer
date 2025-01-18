@@ -43,11 +43,18 @@ Route::middleware('auth:sanctum', 'CheckRole:user')->group(function () {
 
 // Only admin can access
 Route::middleware('auth:sanctum', 'CheckRole:admin')->group(function () {
-    // Template Management routes
+    // Template Management Routes
     Route::post('/admin/templates', [TemplateControlller::class, 'create']);
     Route::patch('/admin/templates/{id}', [TemplateControlller::class, 'patch']);
     Route::delete('/admin/templates/{id}', [TemplateControlller::class, 'delete']);
 
-    // User Management routes
+    // User Management Routes
     Route::delete('/admin/user/{id}', [UserController::class, 'deleteAccount']);
+
+    // Payment Management Routes
+    Route::get('/admin/transactions', [PaymentController::class, 'getAllTransactions']);
+    Route::get('/admin/transactions/{id}', [PaymentController::class, 'getTransaction']);
+    Route::patch('/admin/transactions/{id}', [PaymentController::class, 'updateTransaction']);
+    Route::get('/admin/invoices', [PaymentController::class, 'getInvoices']);
+    Route::get('/admin/invoices/{id}', [PaymentController::class, 'getInvoice']);
 });

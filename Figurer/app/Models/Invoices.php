@@ -4,16 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Transactions extends Model
+class Invoices extends Model
 {
-    protected $table = 'transactions';
+    protected $table = 'invoices';
 
     protected $fillable = [
-        'user_id',
-        'unique_cv_id',
+        'username',
         'invoice_id',
         'order_id',
-        'status,'
+        'status',
+        'amount',
+        'item_id',
     ];
 }
-

@@ -11,6 +11,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use App\Models\User;
+use App\Models\Invoices;
 
 class CheckPaymentStatus implements ShouldQueue
 {
@@ -56,12 +57,22 @@ class CheckPaymentStatus implements ShouldQueue
                 ]);
 
                 $responseBody = json_decode($response->getBody(), true);
-
                 // Check if the response is successful and if the payment is 'settlement'
                 if (isset($responseBody['transaction_status']) && $responseBody['transaction_status'] == 'settlement') {
-                    $this->transaction->status = 'paid';
-                    $this->transaction->save();
-
+                    $invoiceId = uniqid('INV-');
+                    $this->transaction->update([
+                        'status' => 'paid',
+                        'invoice_id' => $invoiceId,
+                    ]);
+                    
+                    Invoices::create([
+                        'username' => $this->transaction->username,
+                        'invoice_id' => uniqid('INV-'),
+                        'order_id' => $this->orderId,
+                        'status' => 'paid',
+                        'amount' => $responseBody['gross_amount'] ?? '0',
+                        'item_id' => $this->transaction->unique_cv_id,
+                    ]);
                     // Retrieve user by ID
                     $user = User::find($this->userId);
                     if ($user) {

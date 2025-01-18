@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
             $table->string('order_id');
+            $table->string('invoice_id');
             $table->string('unique_cv_id');
             $table->string('user_id');
             $table->string('status')->default('pending');

@@ -9,6 +9,7 @@ use App\Models\Transactions;
 use Illuminate\Support\Facades\DB;
 use App\Jobs\CheckPaymentStatus;
 use App\Models\cv_template_data;
+use App\Models\Invoices;
 
 class PaymentController extends Controller
 {
@@ -93,4 +94,35 @@ class PaymentController extends Controller
         return response()->json($transaction);
     }
 
+    public function getTransactions(Request $request)
+    {
+        // Retrieve all transactions
+        $transactions = Transactions::all();
+
+        // Return the transactions
+        return response()->json($transactions);
+    }
+
+    public function getInvoices(Request $request)
+    {
+        // Retrieve all invoices
+        $invoices = Invoices::all();
+
+        // Return the invoices
+        return response()->json($invoices);
+    }
+    
+    public function getinvoicesbyid(Request $request, $id)
+    {
+        // Retrieve the invoice by ID
+        $invoice = Invoices::find($id);
+
+        // If no invoice is found, return an error
+        if (!$invoice) {
+            return response()->json(['error' => 'Invoice not found'], 404);
+        }
+
+        // Return the invoice details
+        return response()->json($invoice);
+    }
 }
