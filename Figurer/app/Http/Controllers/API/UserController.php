@@ -20,5 +20,12 @@ class UserController extends Controller
         $user->update($request->only(['username', 'email']));
         return response()->json(['message' => 'Profile updated successfully']);
     }
+
+    public function deleteAccount(Request $request)
+    {
+        $user = auth()->user();
+        $user->delete();
+        return response()->json(['message' => 'Account deleted successfully']);
+    }
 }
 

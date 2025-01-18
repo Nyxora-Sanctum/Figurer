@@ -11,13 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cv_template_data', function (Blueprint $table) {
+        Schema::create('invoices', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('id_number');
-            $table->string('price');
-            $table->string('template-link');
-            $table->string('template-preview');
+            $table->string('username');
+            $table->string('invoice_id');
+            $table->string('order_id');
+            $table->string('status')->default('pending');
+            $table->string('amount');
+            $table->string('item_id');
             $table->timestamps();
         });
     }
@@ -27,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('cv_template_data');
+        Schema::dropIfExists('invoices');
     }
 };
