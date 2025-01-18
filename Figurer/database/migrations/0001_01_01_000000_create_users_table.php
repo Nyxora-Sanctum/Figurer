@@ -18,7 +18,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('role')->default('user');
-            $table->string('subscription')->default('free');
+            $table->json('owned_template')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
