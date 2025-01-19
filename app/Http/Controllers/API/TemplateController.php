@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\api;
+namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -10,8 +10,10 @@ class TemplateController extends Controller
 {   
     public function getAllOwned(Request $request)
     {
+        \Log::debug('hh');
         $user = auth()->user();
         $ownedTemplate = $user->owned_template;
+        \Log::debug($ownedTemplate);
 
         if (!is_array($ownedTemplate)) {
             $ownedTemplate = json_decode($ownedTemplate, true);
@@ -24,6 +26,7 @@ class TemplateController extends Controller
 
     public function getByID(Request $request, $id)
     {
+        \Log::debug('get cv by id');
         $template = cv_template_data::find($id);
         return response()->json($template);
     }

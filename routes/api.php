@@ -34,7 +34,7 @@ Route::middleware('auth:sanctum', 'CheckRole:user')->group(function () {
     Route::patch('/user/profile', [UserController::class, 'updateProfile']);
 
     // Template Management routes
-    Route::get('/templates/owned-templates', [TemplateController::class, 'getAllOwned']);
+    Route::get('/get-all-owned-templates', [TemplateController::class, 'getAllOwned']);
 
     // Payment routes
     Route::post('/transaction/buy', [PaymentController::class,'payment']);
