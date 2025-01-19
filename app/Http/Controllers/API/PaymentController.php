@@ -18,13 +18,11 @@ class PaymentController extends Controller
         $orderId = 'ORDER-' . Str::random(10);
         $owned_cv_id = auth()->user()->owned_template;
         // Verify if the CV exists in cv_template_data
-        $cv = cv_template_data::find($request->unique_cv_id);
+        $cv = cv_template_data::where('unique_cv_id', $request->unique_cv_id)->first();
         if (!$cv) {
             return response()->json(['error' => 'CV not found'], 404);
         }
-
-        // Verify if the user already owns the CV
-        $ownedTemplates = json_decode($owned_cv_id, true);
+        $ownedTemplates = json_decode($owned_cv_id, true) ?? [];
         if (in_array($request->unique_cv_id, $ownedTemplates)) {
             return response()->json(['error' => 'CV already owned'], 400);
         }
@@ -40,7 +38,7 @@ class PaymentController extends Controller
         $paymentData = [
             'transaction_details' => [
                 'order_id' => $orderId,
-                'gross_amount' => 10000,
+                'gross_amount' => cv_template_data::where('unique_cv_id', $request->unique_cv_id)->first()->price,
             ],
             'credit_card' => [
                 'secure' => true,
@@ -94,7 +92,7 @@ class PaymentController extends Controller
         return response()->json($transaction);
     }
 
-    public function getTransactions(Request $request)
+    public function getAllTransactions(Request $request)
     {
         // Retrieve all transactions
         $transactions = Transactions::all();

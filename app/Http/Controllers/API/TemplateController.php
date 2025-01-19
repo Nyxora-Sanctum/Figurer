@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\cv_template_data;
 
-class TemplateControlller extends Controller
+class TemplateController extends Controller
 {   
     public function getAllOwned(Request $request)
     {
@@ -39,7 +39,7 @@ class TemplateControlller extends Controller
         // Validate the request, including the images
         $data = $request->validate([
             'name' => 'required',
-            'id_number' => 'required',
+            'unique_cv_id' => 'required',
             'price' => 'required',
             'template-link' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'template-preview' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
@@ -63,28 +63,48 @@ class TemplateControlller extends Controller
         return response()->json($template, 201);
     }
 
-    public function patch(Request $request, $id)
+    public function patch(Request $request, $unique_cv_id)
     {
-        $template = cv_template_data::findOrFail($id);
+        // Find the template record using the unique_cv_id
+        $template = cv_template_data::where('unique_cv_id', $unique_cv_id)->firstOrFail();
 
+        // Validate incoming data
         $data = $request->validate([
             'name' => 'required',
-            'id_number' => 'required',
             'price' => 'required',
-            'template-link' => 'required',
-            'template-preview' => 'required',
+            'template-link' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'template-preview' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
+        // Handle 'template-link' file upload
+        if ($request->hasFile('template-link')) {
+            $templateLinkPath = $request->file('template-link')->store('template_links', 'public');
+            $data['template-link'] = $templateLinkPath; // Store the path in the $data array
+        }
+
+        // Handle 'template-preview' file upload
+        if ($request->hasFile('template-preview')) {
+            $templatePreviewPath = $request->file('template-preview')->store('template_previews', 'public');
+            $data['template-preview'] = $templatePreviewPath; // Store the path in the $data array
+        }
+
+        // Update the template record with validated data
         $template->update($data);
 
         return response()->json($template, 200);
     }
 
-    public function delete(Request $request, $id)
+
+    public function delete(Request $request, $unique_cv_id)
     {
-        $template = cv_template_data::findOrFail($id);
+        // Find the template record using the unique_cv_id
+        $template = cv_template_data::where('unique_cv_id', $unique_cv_id)->firstOrFail();
+
+        // Delete the template
         $template->delete();
 
+        // Return a 204 No Content response
         return response()->json(null, 204);
     }
+
 }

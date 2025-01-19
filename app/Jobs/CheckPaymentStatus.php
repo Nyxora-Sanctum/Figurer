@@ -60,19 +60,22 @@ class CheckPaymentStatus implements ShouldQueue
                 // Check if the response is successful and if the payment is 'settlement'
                 if (isset($responseBody['transaction_status']) && $responseBody['transaction_status'] == 'settlement') {
                     $invoiceId = uniqid('INV-');
+                    // Now update the transaction status
                     $this->transaction->update([
-                        'status' => 'paid',
                         'invoice_id' => $invoiceId,
+                        'status' => 'paid',
                     ]);
-                    
+
+                    // Create the invoice first, then mark the transaction as 'paid'
                     Invoices::create([
-                        'username' => $this->transaction->username,
-                        'invoice_id' => uniqid('INV-'),
+                        'username' => User::find($this->userId)->username,
+                        'invoice_id' => $invoiceId,
                         'order_id' => $this->orderId,
                         'status' => 'paid',
                         'amount' => $responseBody['gross_amount'] ?? '0',
                         'item_id' => $this->transaction->unique_cv_id,
                     ]);
+
                     // Retrieve user by ID
                     $user = User::find($this->userId);
                     if ($user) {
@@ -88,6 +91,10 @@ class CheckPaymentStatus implements ShouldQueue
                     } else {
                         Log::error('User not found');
                     }
+
+                    // Mark the transaction as 'paid'
+                    $this->transaction->status = 'paid';
+                    $this->transaction->save();
 
                     break;
                 }

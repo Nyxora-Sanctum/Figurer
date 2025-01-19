@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('cv_template_data', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('id_number');
+            $table->string('unique_cv_id');
             $table->string('price');
-            $table->string('template-link');
-            $table->string('template-preview');
+            $table->string('template-link')->default('null');
+            $table->string('template-preview')->default('null');
             $table->timestamps();
         });
     }

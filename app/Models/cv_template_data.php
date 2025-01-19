@@ -10,7 +10,7 @@ class cv_template_data extends Model
 
     protected $fillable = [
         'name',
-        'id_number',
+        'unique_cv_id',
         'price',
         'template-link',
         'template-preview',

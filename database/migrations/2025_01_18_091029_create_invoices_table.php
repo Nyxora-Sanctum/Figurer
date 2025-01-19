@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('invoices', function (Blueprint $table) {
             $table->id();
             $table->string('username');
-            $table->string('invoice_id');
             $table->string('order_id');
+            $table->string('invoice_id')->nullable();
             $table->string('status')->default('pending');
             $table->string('amount');
             $table->string('item_id');
