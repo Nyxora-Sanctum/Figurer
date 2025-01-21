@@ -10,14 +10,14 @@ class UserController extends Controller
     public function getCurrentProfile(Request $request)
     {
         $user = auth()->user();
-        $profile = $user->only(['username', 'email']);
+        $profile = $user->only(['username', 'email', 'gender', 'phone_number', 'UID']);
         return response()->json($profile);
     }
     
     public function updateProfile(Request $request)
     {
         $user = auth()->user();
-        $user->update($request->only(['username', 'email']));
+        $user->update($request->only(['username', 'email', 'gender', 'phone_number']));
         return response()->json(['message' => 'Profile updated successfully']);
     }
 

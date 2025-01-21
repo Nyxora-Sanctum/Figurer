@@ -10,13 +10,14 @@ use Illuminate\Support\Facades\DB;
 use App\Jobs\CheckPaymentStatus;
 use App\Models\cv_template_data;
 use App\Models\Invoices;
+use App\Models\inventory;
 
 class PaymentController extends Controller
 {
     public function payment(Request $request)
     {
         $orderId = 'ORDER-' . Str::random(10);
-        $owned_cv_id = auth()->user()->owned_template;
+        $owned_cv_id = Inventory::where('UID', auth()->user()->UID)->first()->available_items;
         // Verify if the CV exists in cv_template_data
         $cv = cv_template_data::where('unique_cv_id', $request->unique_cv_id)->first();
         if (!$cv) {

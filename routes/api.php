@@ -9,21 +9,22 @@ use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\TemplateController;
 
 // Public routes to access login and register
-Route::post('/register', [AuthController::class, 'register']);
-Route::post(('/login'), [AuthController::class,'login'])->name('login');
+Route::post('/auth/register', [AuthController::class, 'register']);
+Route::post(('/auth/login'), [AuthController::class,'login'])->name('login');
 
 
 // Both user and admin can access
 Route::middleware(['auth:sanctum'])->group(function () {
     // Template Routes
-    Route::get('/templates/all-templates', [TemplateController::class, 'getAllTemplates']);
-    Route::get('/templates/{id}', [TemplateController::class, 'getByID']);
+    Route::get('/templates/get/all-templates', [TemplateController::class, 'getAllTemplates']);
+    Route::get('/templates/inventory/get/{id}', [TemplateController::class, 'getByID']);
+    Route::get('/templates/inventory/all-used', [TemplateController::class, 'getAllUsed']);
 
     // Logout Routes
-    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/auth/logout', [AuthController::class, 'logout']);
 
     // AI Routes
-    Route::post('/prompt', [AIController::class, 'AIOutput']);
+    Route::post('/ai/prompt', [AIController::class, 'AIOutput']);
 });
 
 // Only user can access
@@ -34,7 +35,8 @@ Route::middleware('auth:sanctum', 'CheckRole:user')->group(function () {
     Route::patch('/user/profile', [UserController::class, 'updateProfile']);
 
     // Template Management routes
-    Route::get('/get-all-owned-templates', [TemplateController::class, 'getAllOwned']);
+    Route::get('/templates/inventory', [TemplateController::class, 'getAllOwned']);
+    Route::post('/templates/use/{id}', [TemplateController::class,'useTemplate']);
 
     // Payment routes
     Route::post('/transaction/buy', [PaymentController::class,'payment']);
@@ -44,17 +46,17 @@ Route::middleware('auth:sanctum', 'CheckRole:user')->group(function () {
 // Only admin can access
 Route::middleware('auth:sanctum', 'CheckRole:admin')->group(function () {
     // Template Management Routes
-    Route::post('/admin/templates', [TemplateController::class, 'create']);
-    Route::patch('/admin/templates/{cv_unique_id}', [TemplateController::class, 'patch']);
-    Route::delete('/admin/templates/{cv_unique_id}', [TemplateController::class, 'delete']);
+    Route::post('/admin/templates/create', [TemplateController::class, 'create']);
+    Route::patch('/admin/templates/patch/{cv_unique_id}', [TemplateController::class, 'patch']);
+    Route::delete('/admin/templates/delete/{cv_unique_id}', [TemplateController::class, 'delete']);
 
     // User Management Routes
-    Route::delete('/admin/user/{id}', [UserController::class, 'deleteAccount']);
+    Route::delete('/admin/user/delete/{id}', [UserController::class, 'deleteAccount']);
 
     // Payment Management Routes
-    Route::get('/admin/transactions', [PaymentController::class, 'getAllTransactions']);
-    Route::get('/admin/transactions/{id}', [PaymentController::class, 'getTransaction']);
-    Route::patch('/admin/transactions/{id}', [PaymentController::class, 'updateTransaction']);
-    Route::get('/admin/invoices', [PaymentController::class, 'getInvoices']);
-    Route::get('/admin/invoices/{id}', [PaymentController::class, 'getInvoice']);
+    Route::get('/admin/transactions/get/all-transactions', [PaymentController::class, 'getAllTransactions']);
+    Route::get('/admin/transactions/get/{id}', [PaymentController::class, 'getTransaction']);
+    Route::patch('/admin/transactions/get/{id}', [PaymentController::class, 'updateTransaction']);
+    Route::get('/admin/invoices/get/all-invoices', [PaymentController::class, 'getInvoices']);
+    Route::get('/admin/invoices/get/{id}', [PaymentController::class, 'getInvoice']);
 });

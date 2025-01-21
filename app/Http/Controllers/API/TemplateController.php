@@ -5,28 +5,85 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\cv_template_data;
+use App\Models\Inventory;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Arr;
+
 
 class TemplateController extends Controller
 {   
+    public function useTemplate(Request $request, $id)
+    {
+        $uid = auth()->user()->UID;
+        $template = cv_template_data::where('unique_cv_id', $id)->first();
+        $inventory = Inventory::where('UID', operator: $uid)->first();
+        $available_items = json_decode($inventory->available_items, true);
+        $used_items = json_decode($inventory->used_items, true);
+
+        if (!$template) {
+            return response()->json(['message' => 'Template not found'], 404);
+        }
+
+        if (!is_array($used_items)) {
+            $used_items = [];
+        }
+
+        if ((!in_array($template->unique_cv_id, $used_items)) && (in_array($template->unique_cv_id, $available_items))) {
+            // Add the template to used_items
+            $used_items['used_items'][] = $template->unique_cv_id;
+            $inventory->used_items = json_encode($used_items);
+            $inventory->save();
+
+            $available_items = json_decode($inventory->available_items, true);
+            $available_items['available_items'] = array_diff($available_items['available_items'], [$template->unique_cv_id]);
+            $inventory->available_items = json_encode($available_items);
+            $inventory->save();
+            
+
+            return response()->json(['message' => 'Template used successfully']);
+        } else {
+            return response()->json(['message' => 'Template already used'], 403);
+        }
+    }
+    
     public function getAllOwned(Request $request)
     {
-        \Log::debug('hh');
-        $user = auth()->user();
-        $ownedTemplate = $user->owned_template;
-        \Log::debug($ownedTemplate);
-
+        $uid = auth()->user()->UID;
+        $ownedTemplate =  Inventory::where('UID', $uid)->first()->available_items;
+        
+        Log::info($ownedTemplate);
         if (!is_array($ownedTemplate)) {
             $ownedTemplate = json_decode($ownedTemplate, true);
         }
+
+        // Flatten the array if it's nested
+        $ownedTemplate = Arr::flatten($ownedTemplate);
 
         $templates = cv_template_data::whereIn('unique_cv_id', $ownedTemplate)->get();
 
         return response()->json($templates);
     }
 
+    public function getAllUsed(Request $request)
+    {
+        $uid = auth()->user()->UID;
+        $usedItems = Inventory::where('UID', $uid)->first()->used_items;
+
+        Log::info($usedItems);
+
+        if (!is_array($usedItems)) {
+            $usedItems = json_decode($usedItems, true);
+        }
+        
+        $usedItems = Arr::flatten($usedItems);
+
+        $templates = cv_template_data::whereIn('unique_cv_id', $usedItems)->get();
+
+        return response()->json($templates);
+    }
+
     public function getByID(Request $request, $id)
     {
-        \Log::debug('get cv by id');
         $template = cv_template_data::find($id);
         return response()->json($template);
     }
@@ -96,7 +153,6 @@ class TemplateController extends Controller
 
         return response()->json($template, 200);
     }
-
 
     public function delete(Request $request, $unique_cv_id)
     {

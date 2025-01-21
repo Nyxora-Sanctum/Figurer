@@ -12,6 +12,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use App\Models\User;
 use App\Models\Invoices;
+use App\Models\Inventory;
 
 class CheckPaymentStatus implements ShouldQueue
 {
@@ -79,18 +80,30 @@ class CheckPaymentStatus implements ShouldQueue
                     // Retrieve user by ID
                     $user = User::find($this->userId);
                     if ($user) {
-                        log::info('user append started');
-                        $ownedTemplate = json_decode($user->owned_template, true);
-                        log::info('on owned template');
-                        $ownedTemplate['owned_template'] = $this->transaction->unique_cv_id;
-                        $user->owned_template = json_encode($ownedTemplate);
-                        Log::info(json_encode($ownedTemplate));
-                        $user->save();
+                        Log::info('User append started');
 
-                        Log::info('Payment successful, transaction marked as paid.');
+                        $inventory = Inventory::where('UID', $user->UID)->first();
+
+                        if ($inventory) {
+                            $ownedTemplate = json_decode($inventory->available_items, true) ?? [];
+                            Log::info('On owned template');
+
+                            // Append the new item to the owned template
+                            $ownedTemplate['available_items'][] = $this->transaction->unique_cv_id;
+
+                            // Update and save the inventory
+                            $inventory->available_items = json_encode($ownedTemplate);
+                            $inventory->save();
+
+                            Log::info('Updated inventory: ' . json_encode($ownedTemplate));
+                            Log::info('Payment successful, transaction marked as paid.');
+                        } else {
+                            Log::error('Inventory not found for UID: ' . $user->UID);
+                        }
                     } else {
                         Log::error('User not found');
                     }
+
 
                     // Mark the transaction as 'paid'
                     $this->transaction->status = 'paid';

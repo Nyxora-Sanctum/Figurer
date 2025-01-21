@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers\API;
 use App\Models\User;
+use App\Models\inventory;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+
+
 class AuthController extends Controller
 {
 
@@ -65,13 +68,25 @@ public function login(Request $request)
             $request->validate([
                 'username' => 'required|string|unique:users,username',
                 'email' => 'required|email|unique:users,email',
-                'password' => 'required|min:8'
+                'password' => 'required|min:8',
+                'gender' => 'nullable|string',
+                'phone_number' => 'nullable|string',
             ]);
 
+            $GeneratedUID = mt_rand(100000000000000, 999999999999999);
             $user = User::create([
                 'username' => $request->username,
                 'email' => $request->email,
-                'password' => bcrypt($request->password)
+                'password' => bcrypt($request->password),
+                'gender' => $request->gender,
+                'phone_number' => $request->phone_number,
+                'UID' => $GeneratedUID,
+            ]);
+
+            $inventory = inventory::create([
+                'UID' => $GeneratedUID,
+                'available_items' => json_encode([]),
+                'used_items' => json_encode([]),
             ]);
 
             // Log in the user
