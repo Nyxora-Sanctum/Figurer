@@ -82,7 +82,7 @@ class CheckPaymentStatus implements ShouldQueue
                     if ($user) {
                         Log::info('User append started');
 
-                        $inventory = Inventory::where('UID', $user->UID)->first();
+                        $inventory = Inventory::where('id', $user->id)->first();
 
                         if ($inventory) {
                             $ownedTemplate = json_decode($inventory->available_items, true) ?? [];
@@ -98,7 +98,7 @@ class CheckPaymentStatus implements ShouldQueue
                             Log::info('Updated inventory: ' . json_encode($ownedTemplate));
                             Log::info('Payment successful, transaction marked as paid.');
                         } else {
-                            Log::error('Inventory not found for UID: ' . $user->UID);
+                            Log::error('Inventory not found for UID: ' . $user->id);
                         }
                     } else {
                         Log::error('User not found');

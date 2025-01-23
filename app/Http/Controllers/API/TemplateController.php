@@ -14,11 +14,12 @@ class TemplateController extends Controller
 {   
     public function useTemplate(Request $request, $id)
     {
-        $uid = auth()->user()->UID;
+        $uid = auth()->user()->id;
         $template = cv_template_data::where('unique_cv_id', $id)->first();
-        $inventory = Inventory::where('UID', operator: $uid)->first();
-        $available_items = json_decode($inventory->available_items, true);
+        $inventory = Inventory::where('id', operator: $uid)->first();
+        $available_items = Arr::flatten(json_decode($inventory->available_items, true));
         $used_items = json_decode($inventory->used_items, true);
+        log::info($available_items);
 
         if (!$template) {
             return response()->json(['message' => 'Template not found'], 404);
@@ -28,7 +29,7 @@ class TemplateController extends Controller
             $used_items = [];
         }
 
-        if ((!in_array($template->unique_cv_id, $used_items)) && (in_array($template->unique_cv_id, $available_items))) {
+        if ((in_array($template->unique_cv_id, $available_items))) {
             // Add the template to used_items
             $used_items['used_items'][] = $template->unique_cv_id;
             $inventory->used_items = json_encode($used_items);
@@ -48,9 +49,15 @@ class TemplateController extends Controller
     
     public function getAllOwned(Request $request)
     {
-        $uid = auth()->user()->UID;
-        $ownedTemplate =  Inventory::where('UID', $uid)->first()->available_items;
-        
+        $uid = auth()->user()->id;
+        $inventory = Inventory::where('id', $uid)->first();
+
+        if (!$inventory) {
+            return response()->json(['message' => 'Inventory not found'], 404);
+        }
+
+        $ownedTemplate = $inventory->available_items;
+
         Log::info($ownedTemplate);
         if (!is_array($ownedTemplate)) {
             $ownedTemplate = json_decode($ownedTemplate, true);
@@ -66,8 +73,8 @@ class TemplateController extends Controller
 
     public function getAllUsed(Request $request)
     {
-        $uid = auth()->user()->UID;
-        $usedItems = Inventory::where('UID', $uid)->first()->used_items;
+        $uid = auth()->user()->id;
+        $usedItems = Inventory::where('id', $uid)->first()->used_items;
 
         Log::info($usedItems);
 

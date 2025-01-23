@@ -17,7 +17,7 @@ class PaymentController extends Controller
     public function payment(Request $request)
     {
         $orderId = 'ORDER-' . Str::random(10);
-        $owned_cv_id = Inventory::where('UID', auth()->user()->UID)->first()->available_items;
+        $owned_cv_id = Inventory::where('id', auth()->user()->id)->first()->available_items;
         // Verify if the CV exists in cv_template_data
         $cv = cv_template_data::where('unique_cv_id', $request->unique_cv_id)->first();
         if (!$cv) {

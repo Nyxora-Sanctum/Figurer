@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\API;
 use App\Models\User;
-use App\Models\inventory;
+use App\Models\Inventory;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -75,16 +75,16 @@ public function login(Request $request)
 
             $GeneratedUID = mt_rand(100000000000000, 999999999999999);
             $user = User::create([
+                'id' => $GeneratedUID,
                 'username' => $request->username,
                 'email' => $request->email,
                 'password' => bcrypt($request->password),
                 'gender' => $request->gender,
                 'phone_number' => $request->phone_number,
-                'UID' => $GeneratedUID,
             ]);
 
-            $inventory = inventory::create([
-                'UID' => $GeneratedUID,
+            $inventory = Inventory::create([
+                'id' => $GeneratedUID,
                 'available_items' => json_encode([]),
                 'used_items' => json_encode([]),
             ]);

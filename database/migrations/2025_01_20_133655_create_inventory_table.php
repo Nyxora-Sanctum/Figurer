@@ -12,8 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('inventory', function (Blueprint $table) {
-            $table->id();
-            $table->string('UID')->unique()->nullable();
+            $table->string('id')->primary();
             $table->json('available_items');
             $table->json('used_items');
             $table->timestamps();

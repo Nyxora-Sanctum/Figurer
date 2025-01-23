@@ -9,7 +9,7 @@ class inventory extends Model
     protected $table = 'inventory';
 
     protected $fillable = [
-        'UID',
+        'id',
         'available_items',
         'used_items',
     ];
