@@ -6,45 +6,56 @@ use App\Models\Inventory;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Hash;
 
 
 class AuthController extends Controller
 {
 
-public function login(Request $request)
-{
-    try {
-        // Validate the incoming request data
-        $request->validate([
-            'username' => 'required|string',
-            'password' => 'required'
-        ]);
+    public function login(Request $request)
+    {
+        try {
+            // Validate the incoming request data
+            $request->validate([
+                'username' => 'required|string',
+                'password' => 'required'
+            ]);
 
-        // Attempt to authenticate the user with the provided credentials
-        if (!auth()->attempt($request->only('username', 'password'))) {
+            // Get the user by username
+            $user = User::where('username', $request->username)->first();
+
+            // Check if the user exists
+            if (!$user) {
+                return response()->json([
+                    'message' => 'Username not found'
+                ], 401);
+            }
+
+            // Check if the password is correct
+            if (!Hash::check($request->password, $user->password)) {
+                return response()->json([
+                    'message' => 'Incorrect password'
+                ], 401);
+            }
+
             return response()->json([
-                'message' => 'Invalid login details'
-            ], 401);
+                'message' => 'Logged in successfully',
+                'token' => $user->createToken('token')->plainTextToken // Return the token in the response
+            ]);
+        } catch (ValidationException $e) {
+            // Handle validation exceptions
+            return response()->json([
+                'message' => $e->getMessage(),
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            // Handle general exceptions
+            return response()->json([
+                'message' => 'An error occurred',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        return response()->json([
-            'message' => 'Logged in successfully',
-            'token' => auth()->user()->createToken('token')->plainTextToken // Return the token in the response
-        ]);
-    } catch (ValidationException $e) {
-        // Handle validation exceptions
-        return response()->json([
-            'message' => $e->getMessage(),
-            'errors' => $e->errors()
-        ], 422);
-    } catch (\Exception $e) {
-        // Handle general exceptions
-        return response()->json([
-            'message' => 'An error occurred',
-            'error' => $e->getMessage()
-        ], 500);
     }
-}
 
 
     public function logout(Request $request){
