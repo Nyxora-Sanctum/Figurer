@@ -10,7 +10,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
-use App\Models\User;
+use App\Models\Accounts;
 use App\Models\Invoices;
 use App\Models\Inventory;
 
@@ -69,7 +69,7 @@ class CheckPaymentStatus implements ShouldQueue
 
                     // Create the invoice first, then mark the transaction as 'paid'
                     Invoices::create([
-                        'username' => User::find($this->userId)->username,
+                        'username' => Accounts::find($this->userId)->username,
                         'invoice_id' => $invoiceId,
                         'order_id' => $this->orderId,
                         'status' => 'paid',
@@ -78,7 +78,7 @@ class CheckPaymentStatus implements ShouldQueue
                     ]);
 
                     // Retrieve user by ID
-                    $user = User::find($this->userId);
+                    $user = Accounts::find($this->userId);
                     if ($user) {
                         Log::info('User append started');
 

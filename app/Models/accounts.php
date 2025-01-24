@@ -9,7 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens; // Correct namespace
 
 
-class User extends Authenticatable
+class accounts extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasApiTokens;
@@ -19,6 +19,8 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
+
+    protected $table = 'accounts';
     protected $fillable = [
         'id',
         'username',
