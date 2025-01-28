@@ -13,7 +13,9 @@ class Transactions extends Model
         'unique_cv_id',
         'invoice_id',
         'order_id',
-        'status,'
+        'status',
+        'created_at',
+        'updated_at',
     ];
 }
 

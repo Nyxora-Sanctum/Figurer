@@ -12,5 +12,7 @@ class inventory extends Model
         'id',
         'available_items',
         'used_items',
+        'created_at',
+        'updated_at',
     ];
 }

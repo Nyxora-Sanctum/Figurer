@@ -14,5 +14,7 @@ class cv_template_data extends Model
         'price',
         'template-link',
         'template-preview',
+        'created_at',
+        'updated_at',
     ];
 }

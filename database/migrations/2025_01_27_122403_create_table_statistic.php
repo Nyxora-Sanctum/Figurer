@@ -11,10 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('inventory', function (Blueprint $table) {
+        Schema::create('statistic', function (Blueprint $table) {
             $table->id();
-            $table->json('available_items');
-            $table->json('used_items');
+            $table->json('page_views');
+            $table->json('registered_users');
+            $table->json('active_users');
+            $table->json('sales');
+
+            // Development Purpose
+            $table->json('api_requests');
+
             $table->timestamps();
         });
     }
@@ -24,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('inventory');
+        Schema::dropIfExists('statistic');
     }
 };

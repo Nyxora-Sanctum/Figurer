@@ -120,4 +120,29 @@ class AuthController extends Controller
         }
     }
 
+    public function checkAuth(Request $request)
+    {
+        try {
+            // Retrieve the authenticated user using the token
+            $user = auth('sanctum')->user();
+
+            // Check if the user is authenticated
+            if ($user) {
+                return response()->json([
+                    'message' => 'Token is valid',
+                    'user' => $user
+                ]);
+            } else {
+                return response()->json([
+                    'message' => 'Token is invalid or expired'
+                ], 401);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'An error occurred',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
 }

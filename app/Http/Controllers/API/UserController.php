@@ -28,4 +28,3 @@ class UserController extends Controller
         return response()->json(['message' => 'Account deleted successfully']);
     }
 }
-

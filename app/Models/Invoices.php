@@ -14,5 +14,7 @@ class Invoices extends Model
         'status',
         'amount',
         'item_id',
+        'created_at',
+        'updated_at',
     ];
 }

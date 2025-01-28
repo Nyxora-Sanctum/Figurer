@@ -30,7 +30,8 @@ class accounts extends Authenticatable
         'phone_number',
         'address',
         'role',
-        'used_template',
+        'created_at',
+        'updated_at',
     ];
 
     /**

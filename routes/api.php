@@ -1,17 +1,18 @@
 <?php
 
+use App\Http\Controllers\api\web\AdminManageAccountController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\PaymentController;
 use App\Http\Controllers\API\AIController;
 use App\Http\Controllers\API\UserController;
+use App\Http\Controllers\API\Web\AdminDashboardController;
 use App\Http\Controllers\API\TemplateController;
 
 // Public routes to access login and register
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post(('/auth/login'), [AuthController::class,'login'])->name('login');
-
 
 // Both user and admin can access
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -25,6 +26,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // AI Routes
     Route::post('/ai/prompt', [AIController::class, 'AIOutput']);
+
+    // User Auth Check routes
+    Route::get('/auth/check', [AuthController::class, 'checkAuth']);
 });
 
 // Only user can access
@@ -59,4 +63,13 @@ Route::middleware('auth:sanctum', 'CheckRole:admin')->group(function () {
     Route::patch('/admin/transactions/get/{id}', [PaymentController::class, 'updateTransaction']);
     Route::get('/admin/invoices/get/all-invoices', [PaymentController::class, 'getInvoices']);
     Route::get('/admin/invoices/get/{id}', [PaymentController::class, 'getInvoice']);
+
+    // Data Routes
+    Route::get('/admin/data/get/total-users', [AdminDashboardController::class, 'getTotalUsers']);
+    Route::get('/admin/data/get/total-incomes', [AdminDashboardController::class, 'getTotalIncomes']);
+    Route::get('/admin/data/get/total-orders', [AdminDashboardController::class, 'getTotalOrders']);
+    Route::get('/admin/data/get/total-templates', [AdminDashboardController::class, 'getTotalTemplates']);
+
+    Route::get('/admin/data/get/accounts', [AdminManageAccountController::class, 'getAllAccounts']);
+    Route::get('/admin/data/get/account/{id}', [AdminManageAccountController::class, 'getAccount']);
 });
