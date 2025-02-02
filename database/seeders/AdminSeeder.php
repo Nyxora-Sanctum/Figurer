@@ -3,7 +3,7 @@
 namespace database\seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\accounts;
+use App\Models\Accounts;
 use App\Models\Inventory;
 use Illuminate\Support\Facades\Hash;
 
@@ -17,7 +17,7 @@ class AdminSeeder extends Seeder
     public function run()
     {
         // Create an admin user
-        accounts::create([
+        Accounts::create([
             'id' => '0', // Set the UID for admi
             'username' => 'admin', // Set the username for admin
             'email' => 'admin@example.com', // Set the admin email

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cv_template_data', function (Blueprint $table) {
+        Schema::create('template', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->string('unique_cv_id');
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('cv_template_data');
+        Schema::dropIfExists('template');
     }
 };

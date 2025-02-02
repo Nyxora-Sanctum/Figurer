@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class cv_template_data extends Model
+class Template extends Model
 {
-    protected $table = 'cv_template_data';
+    protected $table = 'template';
 
     protected $fillable = [
         'name',

@@ -1,13 +1,11 @@
 <?php
 
-use App\Http\Controllers\api\web\AdminManageAccountController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
-use App\Http\Controllers\API\PaymentController;
+use App\Http\Controllers\API\TransactionController;
 use App\Http\Controllers\API\AIController;
-use App\Http\Controllers\API\UserController;
-use App\Http\Controllers\API\Web\AdminDashboardController;
+use App\Http\Controllers\API\AccountController;
 use App\Http\Controllers\API\TemplateController;
 
 // Public routes to access login and register
@@ -35,16 +33,16 @@ Route::middleware(['auth:sanctum'])->group(function () {
 Route::middleware('auth:sanctum', 'CheckRole:user')->group(function () {
     
     // User Management routes
-    Route::get('/user/profile', [UserController::class, 'getCurrentProfile']);
-    Route::patch('/user/profile', [UserController::class, 'updateProfile']);
+    Route::get('/user/profile', [AccountController::class, 'getCurrentProfile']);
+    Route::patch('/user/profile', [AccountController::class, 'updateProfile']);
 
     // Template Management routes
     Route::get('/templates/inventory', [TemplateController::class, 'getAllOwned']);
     Route::post('/templates/use/{id}', [TemplateController::class,'useTemplate']);
 
     // Payment routes
-    Route::post('/transaction/buy', [PaymentController::class,'payment']);
-    Route::get('/transaction/{id}', [PaymentController::class, 'getTransaction']);
+    Route::post('/transaction/buy', [TransactionController::class,'payment']);
+    Route::get('/transaction/{id}', [TransactionController::class, 'getTransaction']);
 });
 
 // Only admin can access
@@ -55,21 +53,27 @@ Route::middleware('auth:sanctum', 'CheckRole:admin')->group(function () {
     Route::delete('/admin/templates/delete/{cv_unique_id}', [TemplateController::class, 'delete']);
 
     // User Management Routes
-    Route::delete('/admin/user/delete/{id}', [UserController::class, 'deleteAccount']);
+    Route::patch('/admin/accounts/update/{id}', [AccountController::class, 'updateProfileAdmin']);
+    Route::delete('/admin/accounts/delete/{id}', [AccountController::class, 'deleteAccount']);
+    Route::get('/admin/data/accounts/get', [AccountController::class, 'getAllAccounts']);
+    Route::get('/admin/data/accounts/get/{id}', [AccountController::class, 'getAccountById']);
+    Route::get('/admin/data/accounts/get/latest/{count}', [AccountController::class, 'getNewUsers']);
 
-    // Payment Management Routes
-    Route::get('/admin/transactions/get/all-transactions', [PaymentController::class, 'getAllTransactions']);
-    Route::get('/admin/transactions/get/{id}', [PaymentController::class, 'getTransaction']);
-    Route::patch('/admin/transactions/get/{id}', [PaymentController::class, 'updateTransaction']);
-    Route::get('/admin/invoices/get/all-invoices', [PaymentController::class, 'getInvoices']);
-    Route::get('/admin/invoices/get/{id}', [PaymentController::class, 'getInvoice']);
+    //  Transactions Management Routes
+    Route::get('/admin/transactions/get/all-transactions', [TransactionController::class, 'getAllTransactions']);
+    Route::get('/admin/transactions/get/{id}', [TransactionController::class, 'getTransaction']);
+    Route::get('/admin/data/transactions/get/latest/{id}', [TransactionController::class, 'getNewTransactions']);
+    Route::patch('/admin/transactions/get/{id}', [TransactionController::class, 'updateTransaction']);
+    Route::post('/admin/transactions/complete/{id}', [TransactionController::class, 'completeTransactionByOrderID']);
+    Route::post('admin/transactions/decline/{id}', [TransactionController::class, 'declineTransactionByOrderID']);
+
+    //Invoice Management Routes
+    Route::get('/admin/invoices/get/all-invoices', [TransactionController::class, 'getInvoices']);
+    Route::get('/admin/invoices/get/{id}', [TransactionController::class, 'getInvoice']);
 
     // Data Routes
-    Route::get('/admin/data/get/total-users', [AdminDashboardController::class, 'getTotalUsers']);
-    Route::get('/admin/data/get/total-incomes', [AdminDashboardController::class, 'getTotalIncomes']);
-    Route::get('/admin/data/get/total-orders', [AdminDashboardController::class, 'getTotalOrders']);
-    Route::get('/admin/data/get/total-templates', [AdminDashboardController::class, 'getTotalTemplates']);
-
-    Route::get('/admin/data/get/accounts', [AdminManageAccountController::class, 'getAllAccounts']);
-    Route::get('/admin/data/get/account/{id}', [AdminManageAccountController::class, 'getAccount']);
+    Route::get('/admin/data/get/total-users', [AccountController::class, 'getTotalUsers']);
+    Route::get('/admin/data/get/total-incomes', [TransactionController::class, 'getTotalIncomes']);
+    Route::get('/admin/data/get/total-orders', [TransactionController::class, 'getTotalOrders']);
+    Route::get('/admin/data/get/total-templates', [TemplateController::class, 'getTotalTemplates']);
 });

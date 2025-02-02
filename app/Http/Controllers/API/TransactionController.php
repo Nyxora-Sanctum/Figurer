@@ -8,18 +8,18 @@ use Illuminate\Support\Str;
 use App\Models\Transactions;
 use Illuminate\Support\Facades\DB;
 use App\Jobs\CheckPaymentStatus;
-use App\Models\cv_template_data;
+use App\Models\Template;
 use App\Models\Invoices;
 use App\Models\inventory;
 
-class PaymentController extends Controller
+class TransactionController extends Controller
 {
     public function payment(Request $request)
     {
         $orderId = 'ORDER-' . Str::random(10);
         $owned_cv_id = Inventory::where('id', auth()->user()->id)->first()->available_items;
         // Verify if the CV exists in cv_template_data
-        $cv = cv_template_data::where('unique_cv_id', $request->unique_cv_id)->first();
+        $cv = Template::where('unique_cv_id', $request->unique_cv_id)->first();
         if (!$cv) {
             return response()->json(['error' => 'CV not found'], 404);
         }
@@ -39,7 +39,7 @@ class PaymentController extends Controller
         $paymentData = [
             'transaction_details' => [
                 'order_id' => $orderId,
-                'gross_amount' => cv_template_data::where('unique_cv_id', $request->unique_cv_id)->first()->price,
+                'gross_amount' => Template::where('unique_cv_id', $request->unique_cv_id)->first()->price,
             ],
             'credit_card' => [
                 'secure' => true,
@@ -95,8 +95,8 @@ class PaymentController extends Controller
 
     public function getAllTransactions(Request $request)
     {
-        // Retrieve all transactions
-        $transactions = Transactions::all();
+        // Retrieve all transactions sorted by the newest
+        $transactions = Transactions::orderBy('created_at', 'desc')->get();
 
         // Return the transactions
         return response()->json($transactions);
@@ -123,5 +123,74 @@ class PaymentController extends Controller
 
         // Return the invoice details
         return response()->json($invoice);
+    }
+
+    public function completeTransactionByOrderID(Request $request, $order_id){
+        $transaction = Transactions::where('order_id', $order_id)->first();
+        if (!$transaction) {
+            return response()->json(['error' => 'Transaction not found'], 404);
+        }
+        $transaction->status = 'paid by admin';
+        $transaction->save();
+        return response()->json(['message' => 'Transaction marked as paid by admin']);
+    }
+
+    public function declineTransactionByOrderID(Request $request, $order_id){
+        $transaction = Transactions::where('order_id', $order_id)->first();
+        if (!$transaction) {
+            return response()->json(['error' => 'Transaction not found'], 404);
+        }
+        $transaction->status = 'declined by admin';
+        $transaction->save();
+        return response()->json(['message' => 'Transaction marked as declined by admin']);
+    }
+
+    public function getNewTransactions(Request $request, $latestcount)
+    {
+        $newTransactions = Transactions::orderBy('created_at', 'desc')
+            ->take($latestcount)
+            ->get();
+
+        // Append the amount variable from invoices by transaction's order ID
+        foreach ($newTransactions as $transaction) {
+            $invoice = Invoices::where('order_id', $transaction->order_id)->first();
+            if ($invoice) {
+                $transaction->amount = $invoice->amount;
+            }
+        }
+
+        return response()->json($newTransactions);
+    }
+
+    function getTotalIncomes(Request $request)
+    {
+        $incomesPerDay = Invoices::selectRaw('SUM(amount) as total, DAY(created_at) as day')
+            ->groupBy('day')
+            ->orderBy('day')
+            ->pluck('total')
+            ->toArray();
+
+        $totalIncomes = array_sum($incomesPerDay);
+
+        return response()->json([
+            'per_day' => $incomesPerDay,
+            'total' => $totalIncomes
+        ]);
+    }
+
+    function getTotalOrders(Request $request)
+    {
+        $ordersPerDay = Transactions::selectRaw('COUNT(*) as count, DAY(created_at) as day')
+            ->groupBy('day')
+            ->orderBy('day')
+            ->pluck('count')
+            ->toArray();
+
+        $totalOrders = array_sum($ordersPerDay);
+
+        return response()->json([
+            'per_day' => $ordersPerDay,
+            'total' => $totalOrders
+        ]);
     }
 }

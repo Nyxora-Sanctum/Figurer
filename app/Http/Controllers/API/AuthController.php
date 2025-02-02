@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\API;
-use App\Models\accounts;
+use App\Models\Accounts;
 use App\Models\Inventory;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -22,7 +22,7 @@ class AuthController extends Controller
             ]);
 
             // Get the user by username
-            $user = accounts::where('username', $request->username)->first();
+            $user = Accounts::where('username', $request->username)->first();
 
             // Check if the user exists
             if (!$user) {
@@ -85,7 +85,7 @@ class AuthController extends Controller
             ]);
 
             $GeneratedUID = mt_rand(100000000000000, 999999999999999);
-            $user = accounts::create([
+            $user = Accounts::create([
                 'id' => $GeneratedUID,
                 'username' => $request->username,
                 'email' => $request->email,

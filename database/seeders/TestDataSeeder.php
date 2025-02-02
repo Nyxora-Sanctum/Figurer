@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\cv_template_data;
-use App\Models\accounts;
+use App\Models\Template;
+use App\Models\Accounts;
 use App\Models\Inventory;
 use App\Models\Invoices;
 use App\Models\Transactions;
@@ -29,7 +29,7 @@ class TestDataSeeder extends Seeder
             $randomTimestamp = $faker->dateTimeBetween('2025-01-01', '2025-12-31')->format('Y-m-d H:i:s');
 
             // Generate account
-            $account = accounts::create([
+            $account = Accounts::create([
                 'username' => $faker->userName,
                 'email' => $faker->safeEmail, // Removed unique()
                 'password' => bcrypt('password'),
@@ -50,7 +50,7 @@ class TestDataSeeder extends Seeder
             ]);
 
             // Generate CV template
-            $cvTemplate = cv_template_data::create([
+            $cvTemplate = Template::create([
                 'name' => $faker->word, // Removed unique()
                 'unique_cv_id' => $faker->uuid, // Removed unique()
                 'price' => $faker->randomFloat(2, 5, 100),

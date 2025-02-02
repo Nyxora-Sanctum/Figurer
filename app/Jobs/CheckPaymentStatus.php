@@ -59,12 +59,19 @@ class CheckPaymentStatus implements ShouldQueue
 
                 $responseBody = json_decode($response->getBody(), true);
                 // Check if the response is successful and if the payment is 'settlement'
-                if (isset($responseBody['transaction_status']) && $responseBody['transaction_status'] == 'settlement') {
+                if ((isset($responseBody['transaction_status']) && $responseBody['transaction_status'] == 'settlement') || Transactions::where('order_id', $this->orderId)->first()->status == 'paid by admin') {
                     $invoiceId = uniqid('INV-');
                     // Now update the transaction status
+                    $status = '';
+                    if (Transactions::where('order_id', $this->orderId)->first()->status == 'paid by admin') {
+                        $status = 'paid by admin';
+                    } else {
+                        $status = 'paid';
+                    } 
+
                     $this->transaction->update([
                         'invoice_id' => $invoiceId,
-                        'status' => 'paid',
+                        'status' => $status,
                     ]);
 
                     // Create the invoice first, then mark the transaction as 'paid'
@@ -72,7 +79,7 @@ class CheckPaymentStatus implements ShouldQueue
                         'username' => Accounts::find($this->userId)->username,
                         'invoice_id' => $invoiceId,
                         'order_id' => $this->orderId,
-                        'status' => 'paid',
+                        'status' => $status,
                         'amount' => $responseBody['gross_amount'] ?? '0',
                         'item_id' => $this->transaction->unique_cv_id,
                     ]);
@@ -109,6 +116,11 @@ class CheckPaymentStatus implements ShouldQueue
                     $this->transaction->status = 'paid';
                     $this->transaction->save();
 
+                    break;
+                }else if(Transactions::where('order_id', $this->orderId)->first()->status == 'declined by admin'){
+                    $this->transaction->update([
+                        'status' => 'declined by admin',
+                    ]);
                     break;
                 }
 

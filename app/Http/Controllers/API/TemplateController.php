@@ -4,7 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\cv_template_data;
+use App\Models\Template;
 use App\Models\Inventory;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Arr;
@@ -15,7 +15,7 @@ class TemplateController extends Controller
     public function useTemplate(Request $request, $id)
     {
         $uid = auth()->user()->id;
-        $template = cv_template_data::where('unique_cv_id', $id)->first();
+        $template = Template::where('unique_cv_id', $id)->first();
         $inventory = Inventory::where('id', operator: $uid)->first();
         $available_items = Arr::flatten(json_decode($inventory->available_items, true));
         $used_items = json_decode($inventory->used_items, true);
@@ -66,7 +66,7 @@ class TemplateController extends Controller
         // Flatten the array if it's nested
         $ownedTemplate = Arr::flatten($ownedTemplate);
 
-        $templates = cv_template_data::whereIn('unique_cv_id', $ownedTemplate)->get();
+        $templates = Template::whereIn('unique_cv_id', $ownedTemplate)->get();
 
         return response()->json($templates);
     }
@@ -84,20 +84,36 @@ class TemplateController extends Controller
         
         $usedItems = Arr::flatten($usedItems);
 
-        $templates = cv_template_data::whereIn('unique_cv_id', $usedItems)->get();
+        $templates = Template::whereIn('unique_cv_id', $usedItems)->get();
 
         return response()->json($templates);
     }
 
+    function getTotalTemplates(Request $request)
+    {
+        $templatesPerDay = Template::selectRaw('COUNT(*) as count, DAY(created_at) as day')
+            ->groupBy('day')
+            ->orderBy('day')
+            ->pluck('count')
+            ->toArray();
+
+        $totalTemplates = array_sum($templatesPerDay);
+
+        return response()->json([
+            'per_day' => $templatesPerDay,
+            'total' => $totalTemplates
+        ]);
+    }
+
     public function getByID(Request $request, $id)
     {
-        $template = cv_template_data::find($id);
+        $template = Template::find($id);
         return response()->json($template);
     }
 
     public function getAllTemplates(Request $request)
     {
-        $templates = cv_template_data::all();
+        $templates = Template::all();
         return response()->json($templates);
     }
 
@@ -108,24 +124,24 @@ class TemplateController extends Controller
             'name' => 'required',
             'unique_cv_id' => 'required',
             'price' => 'required',
-            'template-link' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'template-preview' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'template-link' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:51200', // 50MB (51200 KB)
+            'template-preview' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:51200', // 50MB
         ]);
 
         // Handle the 'template-link' image upload if present
         if ($request->hasFile('template-link')) {
-            $templateLinkPath = $request->file('template-link')->store('template_links', 'public');
+            $templateLinkPath = $request->file('template-link')->store('public/template_links');
             $data['template-link'] = $templateLinkPath;
         }
 
         // Handle the 'template-preview' image upload if present
         if ($request->hasFile('template-preview')) {
-            $templatePreviewPath = $request->file('template-preview')->store('template_previews', 'public');
+            $templatePreviewPath = $request->file('template-preview')->store('public/template_previews');
             $data['template-preview'] = $templatePreviewPath;
         }
 
         // Create the new template entry in the database with the uploaded image paths
-        $template = cv_template_data::create($data);
+        $template = Template::create($data);
 
         return response()->json($template, 201);
     }
@@ -133,7 +149,7 @@ class TemplateController extends Controller
     public function patch(Request $request, $unique_cv_id)
     {
         // Find the template record using the unique_cv_id
-        $template = cv_template_data::where('unique_cv_id', $unique_cv_id)->firstOrFail();
+        $template = Template::where('unique_cv_id', $unique_cv_id)->firstOrFail();
 
         // Validate incoming data
         $data = $request->validate([
@@ -164,7 +180,7 @@ class TemplateController extends Controller
     public function delete(Request $request, $unique_cv_id)
     {
         // Find the template record using the unique_cv_id
-        $template = cv_template_data::where('unique_cv_id', $unique_cv_id)->firstOrFail();
+        $template = Template::where('unique_cv_id', $unique_cv_id)->firstOrFail();
 
         // Delete the template
         $template->delete();
