@@ -24,7 +24,7 @@ class TestDataSeeder extends Seeder
         // Clear faker unique cache
         $faker->unique(true);
 
-        for ($i = 0; $i < 200; $i++) {
+        for ($i = 0; $i < 15; $i++) {
             // Generate random timestamp between January and December 2025
             $randomTimestamp = $faker->dateTimeBetween('2025-01-01', '2025-12-31')->format('Y-m-d H:i:s');
 
@@ -54,8 +54,8 @@ class TestDataSeeder extends Seeder
                 'name' => $faker->word, // Removed unique()
                 'unique_cv_id' => $faker->uuid, // Removed unique()
                 'price' => $faker->randomFloat(2, 5, 100),
-                'template-link' => $faker->url,
-                'template-preview' => $faker->imageUrl(640, 480, 'business', true, 'Template Preview'),
+                'template-link' => 'storage/template_links/VqZO8lNUBaDZPB6mVzKvPQSxu5AFR2PRCyeVQSe3.html',
+                'template-preview' => 'storage/template_previews/0VrSifle2Kjhrt7miiU72s6lqgYNYxcCpfTyxC9K.png',
                 'created_at' => $randomTimestamp,
                 'updated_at' => $randomTimestamp,
             ]);

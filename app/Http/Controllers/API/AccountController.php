@@ -23,10 +23,16 @@ class AccountController extends Controller
     }
 
 
-    public function deleteAccount(Request $request)
+    public function deleteAccount(Request $request, $id)
     {
-        $user = auth()->user();
-        $user->delete();
+        $account = Accounts::find($id);
+
+        if (!$account) {
+            return response()->json(['message' => 'Account not found'], 404);
+        }
+
+        $account->delete();
+
         return response()->json(['message' => 'Account deleted successfully']);
     }
 

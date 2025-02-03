@@ -111,7 +111,7 @@ class TransactionController extends Controller
         return response()->json($invoices);
     }
     
-    public function getinvoicesbyid(Request $request, $id)
+    public function getinvoicebyid(Request $request, $id)
     {
         // Retrieve the invoice by ID
         $invoice = Invoices::find($id);

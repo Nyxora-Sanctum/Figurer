@@ -16,7 +16,8 @@ Route::post(('/auth/login'), [AuthController::class,'login'])->name('login');
 Route::middleware(['auth:sanctum'])->group(function () {
     // Template Routes
     Route::get('/templates/get/all-templates', [TemplateController::class, 'getAllTemplates']);
-    Route::get('/templates/inventory/get/{id}', [TemplateController::class, 'getByID']);
+    Route::get('/templates/inventory/get/{id}', [TemplateController::class, 'getOwnedByID']);
+    Route::get('/templates/get/{id}', [TemplateController::class, 'getByID']);
     Route::get('/templates/inventory/all-used', [TemplateController::class, 'getAllUsed']);
 
     // Logout Routes
@@ -65,11 +66,11 @@ Route::middleware('auth:sanctum', 'CheckRole:admin')->group(function () {
     Route::get('/admin/data/transactions/get/latest/{id}', [TransactionController::class, 'getNewTransactions']);
     Route::patch('/admin/transactions/get/{id}', [TransactionController::class, 'updateTransaction']);
     Route::post('/admin/transactions/complete/{id}', [TransactionController::class, 'completeTransactionByOrderID']);
-    Route::post('admin/transactions/decline/{id}', [TransactionController::class, 'declineTransactionByOrderID']);
+    Route::post('/admin/transactions/decline/{id}', [TransactionController::class, 'declineTransactionByOrderID']);
 
     //Invoice Management Routes
     Route::get('/admin/invoices/get/all-invoices', [TransactionController::class, 'getInvoices']);
-    Route::get('/admin/invoices/get/{id}', [TransactionController::class, 'getInvoice']);
+    Route::get('/admin/invoices/get/{id}', [TransactionController::class, 'getinvoicebyid']);
 
     // Data Routes
     Route::get('/admin/data/get/total-users', [AccountController::class, 'getTotalUsers']);

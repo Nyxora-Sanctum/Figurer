@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Template;
 use App\Models\Inventory;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Arr;
 
 
@@ -105,17 +106,35 @@ class TemplateController extends Controller
         ]);
     }
 
-    public function getByID(Request $request, $id)
+    public function getByID(Request $request, $uniqueCvId)
     {
-        $template = Template::find($id);
+        $template = Template::where('unique_cv_id', $uniqueCvId)->first();
         return response()->json($template);
     }
 
+     public function getOwnedByID(Request $request, $id)
+    {
+        $template = Template::find($id);
+        return response()->json($template);
+    }   
+
     public function getAllTemplates(Request $request)
     {
+        // Fetch all templates
         $templates = Template::all();
+
+        // Add the full URL for template preview images
+        foreach ($templates as &$template) {
+            if ($template->template_preview && Storage::disk('public')->exists('template_previews/' . $template->template_preview)) {
+                // Generate the public URL for the stored template preview image
+                $template->template_preview = Storage::url('template_previews/' . $template->template_preview);
+            }
+        }
+
+        // Return the templates as a JSON response
         return response()->json($templates);
     }
+
 
     public function create(Request $request)
     {
@@ -124,20 +143,21 @@ class TemplateController extends Controller
             'name' => 'required',
             'unique_cv_id' => 'required',
             'price' => 'required',
-            'template-link' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:51200', // 50MB (51200 KB)
-            'template-preview' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:51200', // 50MB
+            'template-link' => 'required|mimes:html,php|max:51200',
+            'template-preview' => 'required|image|mimes:jpeg,png,jpg|max:51200',
         ]);
+        log::info('im here');
 
         // Handle the 'template-link' image upload if present
         if ($request->hasFile('template-link')) {
-            $templateLinkPath = $request->file('template-link')->store('public/template_links');
-            $data['template-link'] = $templateLinkPath;
+            $templateLinkPath = $request->file('template-link')->store('template_links', 'public');
+            $data['template-link'] = 'public/' . $templateLinkPath;
         }
 
         // Handle the 'template-preview' image upload if present
         if ($request->hasFile('template-preview')) {
-            $templatePreviewPath = $request->file('template-preview')->store('public/template_previews');
-            $data['template-preview'] = $templatePreviewPath;
+            $templatePreviewPath = $request->file('template-preview')->store('template_previews', 'public');
+            $data['template-preview'] = 'public/' . $templatePreviewPath;
         }
 
         // Create the new template entry in the database with the uploaded image paths
@@ -155,8 +175,8 @@ class TemplateController extends Controller
         $data = $request->validate([
             'name' => 'required',
             'price' => 'required',
-            'template-link' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'template-preview' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'template-link' => 'nullable|mimes:html,php|max:51200',
+            'template-preview' => 'nullable|image|mimes:jpeg,png,jpg|max:51200',
         ]);
 
         // Handle 'template-link' file upload
