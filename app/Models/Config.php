@@ -9,18 +9,18 @@ class Config extends Model
     protected $table = 'Config';
 
     protected $fillable = [
-        'ai-model',
-        'ai-api-key',
-        'ai-endpoint',
-        'ai-output-format',
-        'ai-supported-language',
-        'ai-system-messages',
-        'max-tokens',
+        'ai_model',
+        'ai_api-key',
+        'ai_endpoint',
+        'ai_output_format',
+        'ai_supported_language',
+        'ai_system_messages',
+        'max_tokens',
         'temperature',
-        'frequency-penalty',
-        'presence-penalty',
-        'best-of',
-        'top-p',
+        'frequency_penalty',
+        'presence_penalty',
+        'best_of',
+        'top_p',
     ];
 
 }

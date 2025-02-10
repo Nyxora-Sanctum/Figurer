@@ -116,7 +116,7 @@ class TemplateController extends Controller
     {
         $template = Template::find($id);
         return response()->json($template);
-    }   
+    }
 
     public function getAllTemplates(Request $request)
     {
@@ -124,17 +124,15 @@ class TemplateController extends Controller
         $templates = Template::all();
 
         // Add the full URL for template preview images
-        foreach ($templates as &$template) {
-            if ($template->template_preview && Storage::disk('public')->exists('template_previews/' . $template->template_preview)) {
-                // Generate the public URL for the stored template preview image
-                $template->template_preview = Storage::url('template_previews/' . $template->template_preview);
+        $templates = $templates->map(function ($template) {
+            if ($template->template_preview && Storage::disk('public')->exists($template->template_preview)) {
+                $template->template_preview = Storage::url($template->template_preview);
             }
-        }
+            return $template;
+        });
 
-        // Return the templates as a JSON response
         return response()->json($templates);
     }
-
 
     public function create(Request $request)
     {
@@ -146,18 +144,18 @@ class TemplateController extends Controller
             'template-link' => 'required|mimes:html,php|max:51200',
             'template-preview' => 'required|image|mimes:jpeg,png,jpg|max:51200',
         ]);
-        log::info('im here');
+
 
         // Handle the 'template-link' image upload if present
         if ($request->hasFile('template-link')) {
             $templateLinkPath = $request->file('template-link')->store('template_links', 'public');
-            $data['template-link'] = 'public/' . $templateLinkPath;
+            $data['template-link'] = 'storage/' . $templateLinkPath;
         }
 
         // Handle the 'template-preview' image upload if present
         if ($request->hasFile('template-preview')) {
             $templatePreviewPath = $request->file('template-preview')->store('template_previews', 'public');
-            $data['template-preview'] = 'public/' . $templatePreviewPath;
+            $data['template-preview'] = 'storage/' . $templatePreviewPath;
         }
 
         // Create the new template entry in the database with the uploaded image paths
@@ -173,8 +171,8 @@ class TemplateController extends Controller
 
         // Validate incoming data
         $data = $request->validate([
-            'name' => 'required',
-            'price' => 'required',
+            'name' => 'nullable',
+            'price' => 'nullable',
             'template-link' => 'nullable|mimes:html,php|max:51200',
             'template-preview' => 'nullable|image|mimes:jpeg,png,jpg|max:51200',
         ]);
@@ -182,13 +180,13 @@ class TemplateController extends Controller
         // Handle 'template-link' file upload
         if ($request->hasFile('template-link')) {
             $templateLinkPath = $request->file('template-link')->store('template_links', 'public');
-            $data['template-link'] = $templateLinkPath; // Store the path in the $data array
+            $data['template-link'] = 'storage/' . $templateLinkPath; // Fix path storage consistency
         }
 
         // Handle 'template-preview' file upload
         if ($request->hasFile('template-preview')) {
             $templatePreviewPath = $request->file('template-preview')->store('template_previews', 'public');
-            $data['template-preview'] = $templatePreviewPath; // Store the path in the $data array
+            $data['template-preview'] = 'storage/' . $templatePreviewPath; // Fix path storage consistency
         }
 
         // Update the template record with validated data
@@ -196,6 +194,7 @@ class TemplateController extends Controller
 
         return response()->json($template, 200);
     }
+
 
     public function delete(Request $request, $unique_cv_id)
     {
@@ -207,6 +206,62 @@ class TemplateController extends Controller
 
         // Return a 204 No Content response
         return response()->json(null, 204);
+    }
+
+    public function getInventoryByID(Request $request, $id)
+    {
+        $template = Inventory::find($id);
+
+        if (!$template) {
+            return response()->json(['error' => 'Inventory not found'], 404);
+        }
+
+        // Decode JSON fields properly
+        $avail = json_decode($template->available_items, true)['available_items'] ?? [];
+        $used = json_decode($template->used_items, true)['used_items'] ?? [];
+
+        // Ensure they are arrays (even if empty)
+        $avail = is_array($avail) ? $avail : [$avail];
+        $used = is_array($used) ? $used : [$used];
+
+        // Fetch templates using unique_cv_id
+        $avail_template = Template::whereIn('unique_cv_id', $avail)->get();
+        $user_template = Template::whereIn('unique_cv_id', $used)->get();
+
+        return response()->json([
+            'available' => $avail_template,
+            'used' => $user_template
+        ]);
+    }
+
+    public function deleteTemplateInventory(Request $request, $id, $unique_cv_id)
+    {
+        $inventory = Inventory::find($id);
+
+        log::info($inventory);
+        if (!$inventory) {
+            return response()->json(['error' => 'Inventory not found'], 404);
+        }
+
+        $available_items = json_decode($inventory->available_items, true);
+
+        if (!is_array($available_items)) {
+            return response()->json(['error' => 'Invalid inventory data'], 400);
+        }
+
+        // Flatten the array properly
+        $available_items = Arr::flatten($available_items);
+
+        // Filter out the item with the given unique_cv_id
+        $available_items = array_filter($available_items, function ($item) use ($unique_cv_id) {
+            return isset($item['unique_cv_id']) && $item['unique_cv_id'] !== $unique_cv_id;
+        });
+
+        // Re-encode the available items and update the inventory
+        $inventory->available_items = json_encode(array_values($available_items));
+        $inventory->save();
+
+        return response()->json(['message' => 'Item deleted successfully']);
     }
 
 }

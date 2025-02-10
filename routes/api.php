@@ -52,6 +52,8 @@ Route::middleware('auth:sanctum', 'CheckRole:admin')->group(function () {
     Route::post('/admin/templates/create', [TemplateController::class, 'create']);
     Route::patch('/admin/templates/patch/{cv_unique_id}', [TemplateController::class, 'patch']);
     Route::delete('/admin/templates/delete/{cv_unique_id}', [TemplateController::class, 'delete']);
+    Route::get('/admin/templates/get/{id}', [TemplateController::class, 'getInventoryByID']);
+    Route::delete('/admin/templates/delete/{id}/{cv_unique_id}', [TemplateController::class, 'deleteTemplateInventory']);
 
     // User Management Routes
     Route::patch('/admin/accounts/update/{id}', [AccountController::class, 'updateProfileAdmin']);
@@ -71,6 +73,10 @@ Route::middleware('auth:sanctum', 'CheckRole:admin')->group(function () {
     //Invoice Management Routes
     Route::get('/admin/invoices/get/all-invoices', [TransactionController::class, 'getInvoices']);
     Route::get('/admin/invoices/get/{id}', [TransactionController::class, 'getinvoicebyid']);
+
+    // AI Configuration Routes
+    Route::get('/admin/config', [AIController::class, 'getAIConfig']);
+    Route::patch('/admin/config', [AIController::class, 'updateAIConfig']);
 
     // Data Routes
     Route::get('/admin/data/get/total-users', [AccountController::class, 'getTotalUsers']);

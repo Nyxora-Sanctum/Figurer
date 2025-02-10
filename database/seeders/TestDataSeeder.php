@@ -24,7 +24,7 @@ class TestDataSeeder extends Seeder
         // Clear faker unique cache
         $faker->unique(true);
 
-        for ($i = 0; $i < 15; $i++) {
+        for ($i = 0; $i < 215; $i++) {
             // Generate random timestamp between January and December 2025
             $randomTimestamp = $faker->dateTimeBetween('2025-01-01', '2025-12-31')->format('Y-m-d H:i:s');
 
@@ -53,9 +53,9 @@ class TestDataSeeder extends Seeder
             $cvTemplate = Template::create([
                 'name' => $faker->word, // Removed unique()
                 'unique_cv_id' => $faker->uuid, // Removed unique()
-                'price' => $faker->randomFloat(2, 5, 100),
-                'template-link' => 'storage/template_links/VqZO8lNUBaDZPB6mVzKvPQSxu5AFR2PRCyeVQSe3.html',
-                'template-preview' => 'storage/template_previews/0VrSifle2Kjhrt7miiU72s6lqgYNYxcCpfTyxC9K.png',
+                'price' => $faker->randomNumber(5, 10, 10000),
+                'template-link' => 'storage/template_links/C1syCKtOJsSvaj6Wprweby46OEDjdmGC6mI2o9st.html',
+                'template-preview' => 'storage/template_previews/wfHucxnG1YzHufhCqNrFXHXn6qENULJlHv3Ce6c9.png',
                 'created_at' => $randomTimestamp,
                 'updated_at' => $randomTimestamp,
             ]);
@@ -68,7 +68,7 @@ class TestDataSeeder extends Seeder
                 'invoice_id' => $faker->uuid, // Removed unique()
                 'order_id' => $orderId,
                 'status' => $faker->randomElement(['paid', 'unpaid']),
-                'amount' => $faker->randomFloat(2, 10, 1000),
+                'amount' => $faker->randomNumber(5, 10, 10000),
                 'item_id' => $cvTemplate->unique_cv_id,
                 'created_at' => $randomTimestamp,
                 'updated_at' => $randomTimestamp,
