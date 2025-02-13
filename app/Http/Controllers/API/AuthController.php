@@ -7,7 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Hash;
-
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -37,7 +37,8 @@ class AuthController extends Controller
                     'message' => 'Incorrect password'
                 ], 401);
             }
-
+            
+            log::info("Successfully Logged In");
             return response()->json([
                 'message' => 'Logged in successfully',
                 'token' => $user->createToken('token')->plainTextToken // Return the token in the response
