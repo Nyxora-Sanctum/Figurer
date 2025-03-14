@@ -43,7 +43,7 @@ Route::middleware('auth:sanctum', 'CheckRole:user')->group(function () {
     // Payment routes
     Route::post('/transaction/buy', [TransactionController::class,'payment']);
     Route::get('/transaction/{id}', [TransactionController::class, 'getTransaction']);
-    Route::get('/invoices/get/{id}', [TransactionController::class, 'getinvoicebyinvoicesid']);
+    Route::get('/invoices/get/{id}', [TransactionController::class, 'getinvoicebyid']);
     Route::get('/invoices/get', [TransactionController::class, 'getAllInvoicesByAccountID']);
 });
 
