@@ -130,7 +130,7 @@ class TransactionController extends Controller
     
     public function getinvoicebyid(Request $request, $id)
     {
-        // Retrieve the invoice by ID
+        // Retrieve single invoice by ID
         $invoice = Invoices::where('invoice_id', $id)->first();
 
         // If no invoice is found, return an error
