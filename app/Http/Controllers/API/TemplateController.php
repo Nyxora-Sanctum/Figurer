@@ -144,6 +144,7 @@ class TemplateController extends Controller
             'template-link' => 'required|mimes:html,php|max:51200',
             'template-preview' => 'required|image|mimes:jpeg,png,jpg|max:51200',
         ]);
+        log::info("here");
 
 
         // Handle the 'template-link' image upload if present

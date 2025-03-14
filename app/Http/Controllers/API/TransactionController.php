@@ -102,6 +102,23 @@ class TransactionController extends Controller
         return response()->json($transactions);
     }
 
+    public function getAllInvoicesByAccountID(Request $request)
+    {
+        // Retrieve user ID from the access token
+        $userId = $request->user()->username;
+
+        // Retrieve invoices by user ID
+        $invoices = Invoices::where('username', $userId)->get();
+
+        // If no invoices are found, return an error
+        if ($invoices->isEmpty()) {
+            return response()->json(['error' => 'No invoices found for this account'], 404);
+        }
+
+        // Return the invoices
+        return response()->json($invoices);
+    }
+    
     public function getInvoices(Request $request)
     {
         // Retrieve all invoices

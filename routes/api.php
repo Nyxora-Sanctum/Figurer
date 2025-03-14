@@ -25,14 +25,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // AI Routes
     Route::post('/ai/prompt', [AIController::class, 'AIOutput']);
-
+    
     // User Auth Check routes
     Route::get('/auth/check', [AuthController::class, 'checkAuth']);
 });
 
 // Only user can access
 Route::middleware('auth:sanctum', 'CheckRole:user')->group(function () {
-    
     // User Management routes
     Route::get('/user/profile', [AccountController::class, 'getCurrentProfile']);
     Route::patch('/user/profile', [AccountController::class, 'updateProfile']);
@@ -44,6 +43,8 @@ Route::middleware('auth:sanctum', 'CheckRole:user')->group(function () {
     // Payment routes
     Route::post('/transaction/buy', [TransactionController::class,'payment']);
     Route::get('/transaction/{id}', [TransactionController::class, 'getTransaction']);
+    Route::get('/invoices/get/{id}', [TransactionController::class, 'getinvoicebyinvoicesid']);
+    Route::get('/invoices/get', [TransactionController::class, 'getAllInvoicesByAccountID']);
 });
 
 // Only admin can access
