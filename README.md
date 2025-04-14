@@ -1,66 +1,147 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+Here's a professional and complete `README.md` documentation draft for your GitHub repository based on your stack and project setup:
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+---
 
-## About Laravel
+# 🧠 AI CV Maker API
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+A RESTful API built with **Laravel 11** for an AI-driven CV (Curriculum Vitae) generator web application. This backend powers a web frontend that leverages **LLaMA Instruct 3.211B** (via **Azure AI Studio**) to generate smart, professional CVs. It supports user accounts, customizable templates, and payment transactions via **Midtrans**.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 🚀 Features
 
-## Learning Laravel
+- 🔐 **Authentication** — Secure login, registration, and token handling using Laravel Sanctum.
+- 👤 **User Management** — Account creation, update, and deletion.
+- 📄 **AI-Driven CV Generation** — Generate CVs via Azure AI Studio using LLaMA Instruct 3.211B.
+- 🎨 **CV Templates** — Predefined, customizable CV templates.
+- 💳 **Transactions** — Payment handling via Midtrans integration.
+- 📦 Modular Controllers:
+  - `AccountController`
+  - `AIController`
+  - `AuthController`
+  - `TemplateController`
+  - `TransactionsController`
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+---
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## 🧱 Tech Stack
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+| Tech              | Usage                        |
+|-------------------|------------------------------|
+| Laravel 11        | Backend framework            |
+| Laravel Sanctum   | API token authentication     |
+| LLaMA 3.211B      | AI model (via Azure AI Studio) |
+| Azure AI Studio   | LLM Inference & Prompting    |
+| Midtrans          | Payment Gateway              |
+| Axios             | API calls from frontend      |
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 📦 Installation
 
-### Premium Partners
+### 1. Clone the Repository
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+```bash
+git clone https://github.com/your-username/ai-cv-maker-api.git
+cd ai-cv-maker-api
+```
 
-## Contributing
+### 2. Install Backend Dependencies
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+```
 
-## Code of Conduct
+### 3. Set Up Environment
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+- Configure your `.env`:
+  - **Database**
+  - **Azure AI Studio credentials**
+  - **Midtrans API keys**
 
-## Security Vulnerabilities
+### 4. Run Migrations
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+php artisan migrate
+```
 
-## License
+### 5. Install Frontend Dependencies (Vite + Tailwind)
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+npm install
+npm run dev
+```
+
+### 6. Start Development Server
+
+```bash
+composer run dev
+```
+
+---
+
+## 📂 API Endpoints Overview
+
+| Route Prefix      | Controller           | Description                    |
+|-------------------|----------------------|--------------------------------|
+| `/api/account`    | AccountController    | Managing auth and account      |
+| `/api/ai`         | AIController         | Generate AI responses from input|
+| `/api/templates`  | TemplateController   | List & customize CV templates  |
+| `/api/transactions` | TransactionsController | Payment creation, status check |
+
+---
+
+## 🧠 AI Integration
+
+Uses **LLaMA Instruct 3.211B** via **Azure AI Studio** for generating personalized CV content based on:
+- User input (education, skills, experiences)
+- Preferred tone/style
+- Selected template
+
+Prompt engineering is handled directly in the `AIController`.
+
+---
+
+## 💳 Midtrans Integration
+
+Transaction flow:
+1. Frontend sends a payment request.
+2. Midtrans Snap token is generated.
+3. User pays through midtrans website.
+4. Midtrans notifies backend via webhook.
+5. CV is unlocked/downloadable after payment confirmation.
+
+---
+
+## 🔐 Authentication
+
+Using Laravel Sanctum for session-based or token-based authentication:
+- Login/register returns a token.
+- Token sent via HTTP cookie or `Authorization` header.
+- Auth-protected routes are guarded with middleware.
+
+---
+
+## 🧪 Testing
+
+```bash
+php artisan test
+```
+
+You can also use Postman collections to test routes and AI integration.
+
+---
+
+## 🛠 Useful Scripts
+
+```bash
+# Dev server with queue listener, logs, and Vite
+composer run dev
+```
+
+
+---
+
+If you’d like, I can generate this file for download or help create Postman collections or OpenAPI docs. Let me know!
