@@ -1,5 +1,3 @@
-Here's a professional and complete `README.md` documentation draft for your GitHub repository based on your stack and project setup:
-
 ---
 
 # 🧠 AI CV Maker API
